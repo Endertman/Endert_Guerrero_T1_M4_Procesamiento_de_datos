@@ -361,3 +361,9 @@ https://content.lameca.com.ar/canvas/0IPP/procesamientodedatos_may22/L4/M4.%20Qu
 https://datapeaker.com/big-data/deteccion-y-tratamiento-de-valores-atipicos-como-manejar-valores-atipicos/#:~:text=4.1%20Detecci%C3%B3n%20de%20valores%20at%C3%ADpicos%20mediante%20Boxplot%3A%20El,vert%3DFalse%29%20plt.title%20%28%22Detecting%20outliers%20using%20Boxplot%22%29%20plt.xlabel%20%28%27Sample%27%29
 
 https://www.analyticslane.com/2022/08/11/graficos-boxplot-con-matplotlib-en-python/
+
+https://www.probabilidadyestadistica.net/diagrama-de-caja-y-bigotes-boxplot/#:~:text=Para%20hacer%20un%20diagrama%20de%20caja%20y%20bigotes,LI%20o%20mayores%20que%20LS.%20...%20M%C3%A1s%20elementos
+
+https://ipp.instructure.com/courses/11228/pages/recursos-conceptuales-m4?module_item_id=121513
+
+https://numpy.org/doc/stable/reference/generated/numpy.quantile.html
