@@ -84,27 +84,267 @@ Primero mostraremos la media, mínimo, máximo y desviación estándar usando la
     print("Mayor venta durante 2021 en millones:", max_gral)
     print("Desviación estándar de las ventas durante 2021 en millones:", des_est_gral)
 
+A partir de este análisis general podemos llegar a las siguientes conclusiones: 
+
+    - La media de las ventas durante 2021 fue de 108.33 millones.
+
+    - La venta individual mas pequeña durante el mismo ciclo fue de 70.0 millones.
+
+    - La venta individual mas grande del 2021 fue de 200.00 millones
+
+    - La desviación estándar nos indica cuán dispersos están los datos en torno a la media, como podemos ver en el caso presentan una dispersion de 34.85 millones, esto significa que las ventas individuales se desvían en promedio aproximadamente 34.85 millones de la media de las ventas.
+
+# Ítem 3
+
+Para hallar datos atípicos debemos hacer un estudio mas completo de los datos por lo comenzare por hacer un estudio individual por clientes.
+
+## Estudio individual
+
+También podemos generar la media, mínimo y máximo de las compras para cada cliente individualmente haciendo uso de "groupby" nuevamente.
+
+### Media
+    
+    med_ind = df.groupby("Clientes")["Ventas"].mean()
+    print("Media de compras por cliente:")
+    print(med_ind)
+
+    med_ind.plot(kind="bar")
+
+    plt.ylabel("Ventas en Millones")
+    plt.title("Media de ventas del año 2021 por cliente")
+
+    plt.show()
+
+La media individual nos muestra que el cliente con mejor media fue Camila, mientras que el peor fue Ana, estos datos los podríamos comparar con la cantidad de compras que realizo cada cliente durante el ciclo para obtener un análisis mas profundo.
+
+### Mínimo
+
+    min_ind = df.groupby("Clientes")["Ventas"].min()
+    print("Menor compra por cliente:")
+    print(min_ind)
+
+    min_ind.plot(kind="bar")
+
+    plt.ylabel("Ventas en Millones")
+    plt.title("Menor venta por cliente durante el año 2021 ")
+
+    plt.show()
+
+Ahora podemos ver que la menor compra individual la realizo Camila dato de bastante valor, mientras que Daniel entre las compras que hizo la menor valor fue la mas alta en esta escala, pero también estos datos los podemos correlacionar con la cantidad de comprar realizadas por los clientes.
+
+### Máximo
+
+    max_ind = df.groupby("Clientes")["Ventas"].max()
+    print("Mayor compra por cliente:")
+    print(max_ind)
+
+    max_ind.plot(kind="bar")
+
+    plt.ylabel("Ventas en Millones")
+    plt.title("Mayor venta por cliente durante el año 2021 ")
+
+    plt.show()
+
+Parecido al estudio anterior podemos ver la mayor compra individual realizada por cliente, Camila realizo la compra individual de mayor valor.
+
+## Correlaciones de los datos obtenidos
+
+Ahora mostrare los datos en un mismo DataFrame para poder estudiarlo y llegar a mejores conclusiones, ademas de agregar un dato muy importante, Cantidad de transacciones realizada por el cliente.
+
+    cant_compras = df["Clientes"].value_counts()
+
+    corr_cant_compras = pd.DataFrame({"Media": med_ind, "Menor compra": min_ind, "Mayor     compra": max_ind, "Cantidad de compras": cant_compras})
+    print(corr_cant_compras)
+
+Como dije anteriormente Camila tiene la compra de mayor y menor valor, este dato nos puede ayudar a entender cual puede ser el dato atípico.
+
+# Datos Atípicos
+
+Ahora a traves de un boxplot podemos ver si existe un outlier y si uno o este es Camila.
+
+## Boxplot
+
+    plt.boxplot(df["Ventas"], vert=False)
+    plt.title("Datos atípicos en las ventas")
+    plt.xlabel("Ventas en millones")
+    plt.show()
+
+    print(df)
+
+A traves del Boxplot podemos ver que tenemos dos Outliers que a diferencia de lo que pensaba la Venta realizada a Camila por 70 millones no es uno de ellos, pero si la venta por 200 millones, también podemos ver que la venta realizada a Juan por 150 millones es otro outlier, por lo que estos datos los podríamos descartar si asi quisiéramos.
+
+## Encontrar Outliers calculando los Quintiles
+
+También podemos encontrar los Outlies calculando los quintiles de forma manual siguiendo la formula:
+
+    IQR = Q3 - Q1
+
+Esta formula nos calcula el rango intercuartílico, que es igual al tercer cuartil menos el primer cuartil, los cuales hallamos haciendo uso de la función "np.quantile", por lo que no debemos restarlos para hallar dicho rango ya que NumPy lo hace automáticamente a traves de esa función, lo que si debemos hacer ahora es calcular los limites inferior(LI) y superior (LS) según la siguiente formula.
+    
+    LI = Q1 - 1.5 * IQR (o lo que es lo mismo) Q3 - Q1
+    
+    LS = Q3 + 1.5 * IQR
+
+Ya habiendo calculado esto podemos mostrar los resultados por pantalla luego de ingresar los resultados de estos quintiles en una nueva variable que llamare Outliers.
+
+    Q1 = np.quantile(df["Ventas"], 0.25)
+    Q3 = np.quantile(df["Ventas"], 0.75)
+    
+    LI = Q1 - 1.5 * (Q3 - Q1)
+    LS = Q3 + 1.5 * (Q3 - Q1)
+    
+    outliers = df[(df["Ventas"] < LI) | (df["Ventas"] > LS)]
+    
+    print("Valores atípicos:")
+    print(outliers)
+
+# Análisis correcto con DataFrame sin Outliers
+
+Ahora crearemos un nuevo DataFrame sin los outliers el cual también podemos mostrar gráficamente, esto lo haremos usando un código similar de la variable "outliers" a diferencia de que invertiremos los operadores de comparación y agregaremos el operado &, haciendo esto nos mostrara los datos dentro del rango deseado.
+
+    fin = df[(df["Ventas"] >= LI) & (df["Ventas"] <= LS)]
+    print(fin)
+
+## Análisis
+    media = fin["Ventas"].mean()
+    minimo = fin["Ventas"].min()
+    maximo = fin["Ventas"].max()
+    desviacion_estandar = fin["Ventas"].std()
+
+    print("Media de ventas durante 2021 en millones:", media)
+    print("Menor venta durante 2021 en millones:", minimo)
+    print("Mayor venta durante 2021 en millones:", maximo)
+    print("Desviación estándar de las ventas durante 2021:", desviacion_estandar)
+
+
+Ahora según este nuevo análisis de sin Outliers nos dice que:
+
+    - La media de ventas fue de 95.0 millones.
+    - La menor venta sigue siendo 70 millones.
+    - La mayor venta fue 110 millones.
+    - Y la desviación estándar fue de 12.70 millones.
+
+## Media individual
+
+    med_ind2 = fin.groupby("Clientes")["Ventas"].mean()
+    print("Media de compras por cliente:")
+    print(med_ind2)
+
+    med_ind2.plot(kind="bar")
+
+    plt.ylabel("Ventas en Millones")
+    plt.title("Media de ventas del año 2021 por cliente")
+
+    plt.show()
+
+## Máximo Individual
+
+    max_ind2 = fin.groupby("Clientes")["Ventas"].max()
+    print("Mayor compra por cliente:")
+    print(max_ind2)
+
+    max_ind2.plot(kind="bar")
+
+    plt.ylabel("Ventas en Millones")
+    plt.title("Mayor venta por cliente durante el año 2021 ")
+
+    plt.show()
+
+## Correlación
+
+    corr_cant_compras2 = pd.DataFrame({"Media": med_ind2, "Menor compra": min_ind2, "Mayor  compra": max_ind2, "Cantidad de compras": cant_compras})
+    print(corr_cant_compras2)
+
+## Boxplot
+
+Ahora haremos un boxplot para revisar nuevamente que no hallan outliers.
+
+    plt.boxplot(fin["Ventas"], vert=False)
+    plt.title("Datos atípicos en las ventas")
+    plt.xlabel("Ventas en millones")
+    plt.show()
+
+    print(fin)
+
+Como pensaba al antes de ejecutar el primer Boxplot la venta por 70 millones también es un outlier, por lo que este también debemos descartarlo.
+
+# Análisis Final
+
+## Encontramos y descartamos el nuevo outlier
+
+    Q1_2 = np.quantile(fin["Ventas"], 0.25)
+    Q3_2 = np.quantile(fin["Ventas"], 0.75)
+
+    LI_2 = Q1_2 - 1.5 * (Q3_2 - Q1_2)
+    LS_2 = Q3_2 + 1.5 * (Q3_2 - Q1_2)
+
+    outliers2 = fin[(fin["Ventas"] < LI_2) | (fin["Ventas"] > LS_2)]
+
+    print("Valores atípicos:")
+    print(outliers2)
+
+# Mostramos en pantalla el DataFrame definitivo.
+
+    fin2 = fin[(fin["Ventas"] >= LI_2) & (fin["Ventas"] <= LS_2)]
+    print(fin2)
+
+# Boxplot sin datos atípicos
+
+    plt.boxplot(fin2["Ventas"], vert=False)
+    plt.title("Datos atípicos en las ventas")
+    plt.xlabel("Ventas en millones")
+    plt.show()
+
+# Conclusion del análisis
+
+    med_ind3 = fin2.groupby("Clientes")["Ventas"].mean()
+    print("Media de compras por cliente:")
+    print(med_ind3)
+
+    med_ind3.plot(kind="bar")
+    plt.ylabel("Ventas en Millones")
+    plt.title("Media de ventas del año 2021 por cliente")
+    plt.show()
+
+    min_ind3 = fin2.groupby("Clientes")["Ventas"].min()
+    print("Menor compra por cliente:")
+    print(min_ind3)
+
+    min_ind3.plot(kind="bar")
+    plt.ylabel("Ventas en Millones")
+    plt.title("Menor venta por cliente durante el año 2021")
+    plt.show()
+
+    max_ind3 = fin2.groupby("Clientes")["Ventas"].max()
+    print("Mayor compra por cliente:")
+    print(max_ind3)
+
+    max_ind3.plot(kind="bar")
+    plt.ylabel("Ventas en Millones")
+    plt.title("Mayor venta por cliente durante el año 2021 ")
+    plt.show()
+
+    , "Mayor  
+    print(corr_cant_compras3)
+
+    print("")
+
+    media3 = fin2["Ventas"].mean()
+    minimo3 = fin2["Ventas"].min()
+    maximo3 = fin2["Ventas"].max()
+    desviacion_estandar3 = fin2["Ventas"].std()
+
+    print("Media de ventas durante 2021 en millones:", media3)
+    print("Menor venta durante 2021 en millones:", minimo3)
+    print("Mayor venta durante 2021 en millones:", maximo3)
+    print("Desviación estándar de las ventas durante 2021:", desviacion_estandar3)
+
+# Como conclusion Camila y sus compras son dato atípico, mientras que la compra de 150 millones realizada por Juan también lo es.
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Referencias
 
 https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.iloc.html
 
