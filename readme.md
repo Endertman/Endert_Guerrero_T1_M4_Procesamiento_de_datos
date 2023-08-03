@@ -2,26 +2,17 @@
 
 Importamos el DataFrame de la actividad del M3 y solucionamos sus errores.
 
-    Ventas_Clientes_2021 = pd.Series([100.0,200.0,"110,0",90.0, 150.0,80.0,70.0,100.0,110.0,90.0,"100,00"])
-    Ventas_Clientes_2021 = Ventas_Clientes_2021.replace({',':   '.', '"': ''},regex=True).astype(float)
+    Ventas_Clientes_2021 = pd.Series([100.0,200.0,"110,0",90.0,150.0,80.0,70.0,100.0,100.00,    110.0,90.0,"100,00"])
+    Ventas_Clientes_2021 = Ventas_Clientes_2021.replace({',': '.', '"': ''}, regex=True).   astype(float)
 
-    Clientes_2021 = pd.Series (["JUan","camila","DanIel",   "Luis","Juan","Ana","Camila","Ana","LuiS","Ana","Juan"])
+    Clientes_2021 = pd.Series (["JUan","camila","DanIel","Luis","Juan","Ana","Camila","Ana",    "LuiS","Juan","Ana","Juan"])
     Clientes_2021 = Clientes_2021.str.title()
-
-## Le agregamos nuevos valores encontrados en el DataFrame del caso de estudio
-
-Haremos uso de "iloc" para agregar un valor faltante en las ventas y un cliente faltante en la posición correcta, luego guardaremos los cambios en nuevas variables.
-
-    nuevo_cliente = "Juan"
-    Clientes_2021.iloc[10] = nuevo_cliente
-
-    nuevo_valor = 100.0
-    Ventas_Clientes_2021.iloc[9] = nuevo_valor
 
 # Ítem 1
 
 ## Creamos y mostramos en pantalla el DataFrame
 
+    df = pd.DataFrame({"Clientes":Clientes_2021,"Ventas":Ventas_Clientes_2021})
     print(df)
 
 ## Agrupamos por clientes y organizamos de mayor a menor
